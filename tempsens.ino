@@ -1,8 +1,6 @@
-/*********
-  Rui Santos
-  Complete project details at https://randomnerdtutorials.com  
-  Based on the Dallas Temperature Library example
-*********/
+// Download the library from manage libraries on your Arduino application
+// Download OneWire library by Paul Stoffregen
+// Download Dallas Temperature library by Miles Burton
 
 #include <OneWire.h>
 #include <DallasTemperature.h>
