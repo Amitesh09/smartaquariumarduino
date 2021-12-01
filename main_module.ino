@@ -26,8 +26,8 @@ struct Color {
 #define thirdPin 26
 #define thirdMuxPin 0
 
-#define pHPin 53
-#define pHValPin 8
+#define pHPin 23
+#define pHValPin A15
 
 #define commonAnode true
 byte gammatable[256];
@@ -43,6 +43,7 @@ Adafruit_TCS34725 tcs3;// = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS
 #define pumpPin5 38
 #define pumpPin6 40
 
+#define GPIO 51
 
 #define servo1_pin A4
 #define servo2_pin A5
@@ -50,21 +51,6 @@ Adafruit_TCS34725 tcs3;// = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS
 #define servo4_pin A7
 #define fishServo A2
 
-void set_low_on_startup() {
-  digitalWrite(pumpPin1, LOW);
-  digitalWrite(pumpPin2, LOW);
-  digitalWrite(pumpPin3, LOW);
-  digitalWrite(firstPin, LOW);
-  digitalWrite(secondPin, LOW);
-  digitalWrite(thirdPin, LOW);
-  
-  analogWrite(servo1_pin, LOW);
-  analogWrite(servo2_pin, LOW);
-  analogWrite(servo3_pin, LOW);
-  analogWrite(servo4_pin, LOW);
-  analogWrite(fishServo, LOW);
-
-}
 // Data wire is conntec to the Arduino digital pin 2
 #define ONE_WIRE_BUS A3
 
@@ -86,6 +72,9 @@ void setup(void)
   Servo2.attach(servo2_pin);
   turn_servo_to_angle(Servo2, 0);
   delay(200);
+  Servo3.attach(servo3_pin);
+  turn_servo_to_angle(Servo3, 0);
+  delay(200);
 
   // Serial setup
   // Serial is for debugging and Serial3 is for communication with the wifi module
@@ -100,11 +89,23 @@ void setup(void)
   pinMode(pHPin,OUTPUT);
 
 
+  pinMode(GPIO, OUTPUT);
+  digitalWrite(GPIO, LOW);   
+
   pinMode(pumpPin1, OUTPUT);
   digitalWrite(pumpPin1, LOW);
+  pinMode(pumpPin2, OUTPUT);
+  digitalWrite(pumpPin2, LOW);
+  pinMode(pumpPin3, OUTPUT);
+  digitalWrite(pumpPin3, LOW);
+  pinMode(pumpPin4, OUTPUT);
+  digitalWrite(pumpPin4, LOW);
+  pinMode(pumpPin5, OUTPUT);
+  digitalWrite(pumpPin5, LOW);
+  pinMode(pumpPin6, OUTPUT);
+  digitalWrite(pumpPin6, LOW);
 
   // Start up the library
-  // sensors.begin();
   initialize_temp_sensor();
 
   // Delay to allow wifi to connect
@@ -115,8 +116,6 @@ void setup(void)
 void loop(void){ 
   // Color sensor code
   //run_chemical_test();
-
-
   // Temperature Code
   float tempReading = get_current_temp();
   Serial.println(tempReading);
@@ -140,8 +139,8 @@ void loop(void){
   float phValue = run_pH_sensor();
   delay(8000);
   digitalWrite(pHPin, LOW); 
-  Serial.println("pH:");  
-  Serial.print(phValue,2);
+  Serial.print("pH= ");  
+  Serial.println(phValue,2);
   
   send_ph_to_server(phValue);
   
@@ -370,9 +369,13 @@ void run_chemical_test()
   float red2, green2, blue2;
   float red3, green3, blue3;
 
-  digitalWrite(pumpPin1, HIGH);
-  delay(4000);
-  digitalWrite(pumpPin1, LOW);
+  digitalWrite(pumpPin5, HIGH);
+  delay(5000);
+  digitalWrite(pumpPin5, LOW);
+  
+  //turn_servo_to_angle(Servo1, 180);
+  //delay(2000);
+  
   digitalWrite(firstPin, HIGH);
   delay(1000);
   
@@ -394,20 +397,28 @@ void run_chemical_test()
   Serial.print("\n");
 
 
-  digitalWrite(pumpPin2, HIGH);
-  delay(100);
-  digitalWrite(pumpPin2, LOW);
+  digitalWrite(pumpPin3, HIGH);
+  delay(5000);
+  digitalWrite(pumpPin3, LOW);
+  delay(2000);
 
+  digitalWrite(GPIO, HIGH);
+  turn_servo_to_angle(Servo2, 180);
+  digitalWrite(GPIO, LOW);
+  delay(2000);
+  
   digitalWrite(secondPin, HIGH);
   delay(1000);
   initialize_color_sensors();
   delay(1000);
+  
   select_mux_bus(3);
   tcs2.setInterrupt(false);  // turn on LED
   delay(60);  // takes 50ms to read
   tcs2.getRGB(&red2, &green2, &blue2);
   tcs2.setInterrupt(true);  // turn off LED
   delay(1000);
+  
   digitalWrite(secondPin, LOW);
 
   Serial.println("Second sensor:");
@@ -416,11 +427,14 @@ void run_chemical_test()
   Serial.print("\tB:\t"); Serial.print(int(blue2));
   Serial.print("\n");
 
+  digitalWrite(pumpPin6, HIGH);
+  delay(5000);
+  digitalWrite(pumpPin6, LOW);
+  delay(2000);
 
-  digitalWrite(pumpPin3, HIGH);
-  delay(100);
-  digitalWrite(pumpPin3, LOW);
-
+  turn_servo_to_angle(Servo3, 180);
+  delay(2000);
+  
   digitalWrite(thirdPin, HIGH);
   delay(1000);
   initialize_color_sensors();
@@ -456,7 +470,7 @@ void turn_servo_to_angle(Servo servo, int angle)
 }
         
 float run_pH_sensor(){
-  
+  int sensorValue = 0; 
   unsigned long int avgValue;
   float b;
   int buf[10],temp;
@@ -481,8 +495,8 @@ float run_pH_sensor(){
   avgValue=0;
   for(int i=2;i<8;i++)                      
     avgValue+=buf[i];
-  float phValue=(float)avgValue*5.0/1024/6; 
-  phValue=3.5*phValue;  
+  float phVol=(float)avgValue*5.0/1024/6; 
+  float phValue = -5.70 * phVol + 21.34;
                    
   return phValue;
 }
