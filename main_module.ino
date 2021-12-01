@@ -1,6 +1,7 @@
 /*
  * This is the main firmware to be run on the Arduino Mega
  */
+ 
 #include <stdlib.h>
 #include <Servo.h>
 #include <OneWire.h>
@@ -67,14 +68,8 @@ void setup(void)
 {
   //Servo setup
   Servo1.attach(servo1_pin);
-  turn_servo_to_angle(Servo1, 0);
-  delay(200);
   Servo2.attach(servo2_pin);
-  turn_servo_to_angle(Servo2, 0);
-  delay(200);
   Servo3.attach(servo3_pin);
-  turn_servo_to_angle(Servo3, 0);
-  delay(200);
 
   // Serial setup
   // Serial is for debugging and Serial3 is for communication with the wifi module
@@ -313,17 +308,6 @@ void select_mux_bus(uint8_t bus)
   delay(50);
 }
 
-//void initialize_color_sensor(int sensorNumber)
-//{
-//  select_mux_bus(firstMuxPin);
-//  tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
-//  if (tcs.begin()) {
-//    Serial.println("Sensor 1 found");
-//  } else {
-//    Serial.println("Sensor 1 not found");
-//  }
-//}
-
 void send_reset_signal(int id)
 {
   JSONVar resetValueJSON;
@@ -462,11 +446,6 @@ Color get_rgb_values_from_color_sensor(int sensor_number)
 void turn_servo_to_angle(Servo servo, int angle)
 {
   servo.write(angle);
-  //delay(2000);
-
-  //feedback = analogRead(A0);//Connect Analog pin to A0
-  //observedAngle = (double) feedback * 0.47-33.4;
-  //Serial.println(observedAngle);
 }
         
 float run_pH_sensor(){
