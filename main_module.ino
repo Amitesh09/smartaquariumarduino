@@ -46,9 +46,9 @@ Adafruit_TCS34725 tcs3;// = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS
 
 #define GPIO 51
 
-#define servo1_pin A4
-#define servo2_pin A5
-#define servo3_pin A6
+#define servo1_pin 8
+#define servo2_pin 9
+#define servo3_pin 7
 #define servo4_pin A7
 #define fishServo A2
 
@@ -357,8 +357,8 @@ void run_chemical_test()
   delay(5000);
   digitalWrite(pumpPin5, LOW);
   
-  //turn_servo_to_angle(Servo1, 180);
-  //delay(2000);
+  turn_servo_to_angle(Servo1, 180);
+  delay(2000);
   
   digitalWrite(firstPin, HIGH);
   delay(1000);
@@ -386,9 +386,8 @@ void run_chemical_test()
   digitalWrite(pumpPin3, LOW);
   delay(2000);
 
-  digitalWrite(GPIO, HIGH);
+
   turn_servo_to_angle(Servo2, 180);
-  digitalWrite(GPIO, LOW);
   delay(2000);
   
   digitalWrite(secondPin, HIGH);
